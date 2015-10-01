@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+
+    <title>Bootstrap FTW</title>
+
+    <link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css" rel="stylesheet" />
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" rel="stylesheet"/>
+    <link th:href="@{/css/bootstrap-datepicker.css}" rel="stylesheet"/>
+    <link th:href="@{/css/bootstrap-datepicker.standalone.css}" rel="stylesheet"/>
+    <link th:href="@{/css/bootstrap-datepicker3.css}" rel="stylesheet"/>
+    <link th:href="@{/css/bootstrap-datepicker3.standalone.css}" rel="stylesheet"/>
+
+    <script src="https://code.jquery.com/jquery-2.1.4.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+    <script th:src="@{/js/bootstrap-datepicker.js}"></script>
+
+    <script th:src="@{/js/summernote.js}"></script>
+    <link th:href="@{/css/summernote.css}" rel="stylesheet"/>
+
+    <script type="text/javascript">
+        $(function () {
+            $("#birthDate").datepicker({});
+
+            $("#aboutMeArea").summernote({
+                height: 200,
+                minHeight: 100,
+                maxHeight: 400
+            });
+
+            $("#aboutMeArea").code($("#aboutMe").val());
+
+            $("#registrationForm").submit(function() {
+                var code = $("#aboutMeArea").code();
+                $("#aboutMe").val(code);
+                return true;
+            });
+
+        });
+    </script>
+</head>
+
+<body>
+
+<div class="container">
+
+    <div th:replace="fragments/header :: header ('register')"></div>
+
+    <div class="jumbotron">
+        <h3> Register user </h3>
+
+        <form action="#" th:action="@{/}" th:object="${model}" method="post" id="registrationForm">
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="text" class="form-control" id="email" th:field="*{email}"/>
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" class="form-control" id="password" th:field="*{password}"/>
+            </div>
+            <div class="form-group">
+                <label for="repeatPassword">Repeat password</label>
+                <input type="password" class="form-control" id="repeatPassword" th:field="*{repeatedPassword}"/>
+            </div>
+            <div class="form-group">
+                <label for="accountType">Account type</label>
+                <select class="form-control" id="accountType" th:field="*{accountType}">
+                    <option value="none">Select...</option>
+                    <option th:each="type : ${accountTypes}"
+                            th:value="${type}" th:text="${type}">
+                    </option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Gender</label>
+                <ul style="list-style-type: none;">
+                    <li th:each="ty : ${genders}">
+                        <input type="radio" th:field="*{gender}" th:value="${ty}"/>
+                        <label th:for="${#ids.prev('gender')}" th:text="${ty}"></label>
+                    </li>
+                </ul>
+            </div>
+            <div class="form-group">
+                <label>Foreign languages</label>
+
+                <div>
+                    <label class="checkbox-inline" th:each="language : ${foreignLanguages}">
+                        <input type="checkbox" th:field="*{foreignLanguages}" th:value="${language}"
+                               th:text="${language}"/>
+                    </label>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="birthDate">Birth date</label>
+                <input type="text" id="birthDate" class="form-control" th:field="*{birthDate}"/>
+            </div>
+            <div class="form-group">
+                <label for="aboutMeArea">About me</label>
+                <div id="aboutMeArea">
+                </div>
+                <input type="hidden" th:field="*{aboutMe}" name="aboutMe" id="aboutMe" />
+            </div>
+
+            <button type="submit" class="btn btn-default">Submit</button>
+        </form>
+
+    </div>
+
+</div>
+<!-- /container -->
+
+
+</body>
+</html>
+
