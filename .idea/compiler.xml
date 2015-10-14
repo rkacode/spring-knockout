@@ -22,11 +22,11 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <processorPath useClasspath="true" />
-        <module name="layouts" />
+        <module name="spring-knockout" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
-      <module name="layouts" target="1.8" />
+      <module name="spring-knockout" target="1.8" />
     </bytecodeTargetLevel>
   </component>
 </project>
