@@ -1,5 +1,6 @@
 package org.demo.thm.rest;
 
+import com.codahale.metrics.annotation.Timed;
 import org.demo.thm.entity.Item;
 import org.demo.thm.repository.ItemRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +20,7 @@ public class ItemResource {
     }
 
     @RequestMapping(value = "/item", method = RequestMethod.GET)
+    @Timed
     public Iterable<Item> getAll() {
         return itemRepository.findAll();
     }
