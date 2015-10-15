@@ -23,7 +23,7 @@ public class ItemResource {
         return itemRepository.findAll();
     }
 
-    @RequestMapping(value = "/item", method = RequestMethod.PUT)
+    @RequestMapping(value = "/item", method = RequestMethod.POST)
     public ResponseEntity create(@RequestBody Item item) {
         itemRepository.save(item);
         return new ResponseEntity(HttpStatus.CREATED);

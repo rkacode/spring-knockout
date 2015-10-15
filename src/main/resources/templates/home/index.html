@@ -7,19 +7,162 @@
 
     <title>Spring knockout</title>
 
-    <link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css" rel="stylesheet" />
+    <link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css" rel="stylesheet"/>
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" rel="stylesheet"/>
     <script src="https://code.jquery.com/jquery-2.1.4.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/knockout/3.3.0/knockout-debug.js"></script>
+
+    <script type="text/javascript">
+        $(function() {
+            ko.bindingHandlers.bootstrapShowModal = {
+                init: function (element, valueAccessor) {
+                },
+                update: function (element, valueAccessor) {
+                    var value = valueAccessor();
+                    if (ko.utils.unwrapObservable(value)) {
+                        $(element).modal('show');
+                        // this is to focus input field inside dialog
+                        $("input", element).focus();
+                    }
+                    else {
+                        $(element).modal('hide');
+                    }
+                }
+            };
+
+            function Item(name, price, markup) {
+                var self = this;
+                self.name = name;
+                self.price = price;
+                self.markup = markup;
+            }
+
+            function ItemViewModel() {
+                var self = this;
+
+                self.name = ko.observable('');
+                self.price = ko.observable(0);
+                self.markup = ko.observable(0);
+
+                self.clear = function() {
+                    self.name('');
+                    self.price(0);
+                    self.markup(0);
+                }
+            }
+
+            function ItemsViewModel() {
+                var self = this;
+
+                self.items = ko.observableArray();
+
+                self.modal = ko.observable(false);
+
+                self.item = new ItemViewModel();
+
+                self.showModal = function () {
+                    self.modal(true);
+                };
+
+                self.hideModal = function () {
+                    self.item.clear();
+                    self.modal(false);
+                }
+
+                self.saveItem = function() {
+                    var itemToSave = new Item(self.item.name(), self.item.price(), self.item.markup());
+
+                    $.ajax({
+                        url:'/item',
+                        type:'POST',
+                        data: JSON.stringify(itemToSave),
+                        dataType: 'json',
+                        contentType: "application/json; charset=utf-8"
+                    });
+
+                    self.modal(false);
+                    self.items.push(itemToSave);
+                    self.item.clear();
+                };
+            }
+
+            var itemsViewModel = new ItemsViewModel();
+
+            $("#showModal").click(function() {
+               itemsViewModel.showModal();
+            });
+
+            $.get('/item', function(data) {
+                console.log(data);
+                ko.utils.arrayPushAll(itemsViewModel.items, data);
+            });
+
+            ko.applyBindings(itemsViewModel);
+        });
+
+    </script>
 </head>
 
 <body>
 
 <div class="container">
 
-    <div class="jumbotron">
-        <h3>You're successfuly registered</h3>
+    <!-- Button trigger modal -->
+    <button type="button" class="btn btn-primary btn-lg" id="showModal">
+        Launch demo modal
+    </button>
+
+    <!-- Modal -->
+    <div class="modal fade" data-keyboard="false" data-backdrop="static" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" data-bind="bootstrapShowModal:modal">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-bind="click: hideModal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="myModalLabel">Modal title</h4>
+                </div>
+                <div class="modal-body" style="padding: 20px">
+                    <form class="form-horizontal">
+                        <div class="form-group">
+                            <label for="itemName"> Name </label>
+                            <input type="text" class="form-control" id="itemName" data-bind="textInput: item.name" />
+                        </div>
+                        <div class="form-group">
+                            <label for="itemPrice"> Price </label>
+                            <input type="text" class="form-control" id="itemPrice" data-bind="textInput: item.price" />
+                        </div>
+                        <div class="form-group">
+                            <label for="itemMarkup"> Markup </label>
+                            <input type="text" class="form-control" id="itemMarkup" data-bind="textInput: item.markup" />
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-bind="click: hideModal">Close</button>
+                    <button type="button" class="btn btn-primary" data-bind="click: saveItem">Save changes</button>
+                </div>
+            </div>
+        </div>
     </div>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th> Name </th>
+                <th> Price </th>
+                <th> Markup </th>
+            </tr>
+        </thead>
+
+        <tbody data-bind="foreach: items">
+            <tr>
+                <td data-bind="text: name"></td>
+                <td data-bind="text: price"></td>
+                <td data-bind="text: markup"></td>
+            </tr>
+        </tbody>
+    </table>
+
 
 </div>
 <!-- /container -->
